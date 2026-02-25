@@ -1,0 +1,88 @@
+/* DeckForge Cyberpunk SRE Theme */
+$primary: #00FF41;    /* Matrix Green */
+$secondary: #FFB000;  /* Amber Warning */
+$error: #FF003C;      /* Cyber Red */
+$bg: #0A0A0A;         /* Deep Black */
+$surface: #1A1A1A;
+$panel: #242424;
+
+Screen {
+    background: $bg;
+    color: $primary;
+}
+
+Header {
+    background: $surface;
+    color: $primary;
+    text-style: bold;
+    border: solid $primary;
+    height: 3;
+}
+
+Footer {
+    background: $surface;
+    color: $secondary;
+}
+
+#sidebar {
+    width: 30;
+    background: $surface;
+    border-right: solid $primary;
+    dock: left;
+}
+
+.panel-title {
+    color: $secondary;
+    text-style: underline bold;
+    margin-bottom: 1;
+}
+
+.stat-card {
+    background: $panel;
+    border: solid $primary;
+    height: 7;
+    padding: 1;
+    margin: 1;
+}
+
+RichLog, TextArea {
+    background: $bg;
+    border: solid $panel;
+    color: #C0C0C0;
+}
+
+Input {
+    background: $surface;
+    border: solid $primary;
+    color: $primary;
+}
+
+Input:focus {
+    border: solid $secondary;
+}
+
+DataTable {
+    height: 1fr;
+    border: solid $primary;
+    background: $bg;
+}
+
+#metrics-grid {
+    grid-size: 2 1;
+    grid-gutter: 1 1;
+    height: 10;
+}
+
+.status-indicator {
+    width: 15;
+    height: 1;
+    margin: 1 1;
+    text-align: center;
+    text-style: bold;
+    background: #333333;
+}
+
+.state-idle { background: #0000FF; }
+.state-thinking { background: $secondary; color: black; }
+.state-executing { background: $primary; color: black; }
+.state-failed { background: $error; }

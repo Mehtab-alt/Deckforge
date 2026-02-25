@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # The Headless Brain (API)
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile.api
+    ports: ["8000:8000"]
+    env_file: .env
+    depends_on: [db, redis]
+    volumes: [./exports:/app/exports]
+
+  # The Muscle (Async Worker)
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    command: celery -A worker.tasks.celery_app worker --loglevel=info
+    env_file: .env
+    depends_on: [db, redis]
+    volumes: [./exports:/app/exports]
+
+  # The Frontend (Streamlit - Now a thin client)
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.api # Reusing python image for simplicity
+    command: streamlit run app_frontend.py
+    ports: ["8501:8501"]
+    env_file: .env
+    depends_on: [api]
+
+  # State Storage
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: deckforge
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: deckforge_prod
+    volumes: [pg_data:/var/lib/postgresql/data]
+
+  # Message Broker
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  pg_data:

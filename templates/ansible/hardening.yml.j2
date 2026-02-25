@@ -1,0 +1,60 @@
+---
+- name: Security Hardening for {{ project_name }}
+  hosts: all
+  become: yes
+  vars:
+    project_name: "{{ project_name }}"
+    region: "{{ region }}"
+    security_policy: "{{ retrieved_policy }}"
+
+  tasks:
+    - name: Update system packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install security packages
+      package:
+        name:
+          - fail2ban
+          - ufw
+          - auditd
+        state: present
+
+    - name: Configure UFW firewall
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 22
+        - 80
+        - 443
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: deny
+
+    - name: Configure SSH security
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        backup: yes
+      loop:
+        - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+        - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+        - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
+      notify: restart ssh
+
+    - name: Apply corporate security policy
+      debug:
+        msg: "Corporate Policy Applied: {{ security_policy }}"
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
